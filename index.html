@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700&display=swap&subset=cyrillic" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Work+Sans&display=swap" rel="stylesheet">
+	<title>WeatherApp</title>
+	<script type="text/javascript">
+		function city_search(){ 
+			var name = document.getElementById('city_search').value;
+			weatherGet(name);
+		}
+
+		function weatherGet(cityName) {
+		  	var key = 'f4dea9300fcd585328ecbaf827e848a9';
+		  	fetch('https://api.openweathermap.org/data/2.5/weather?q=' + cityName+ '&appid=' + key)  
+		  	.then(function(resp) { 
+		  		if (resp.status==404) {alert("City not found");}
+		  		return resp.json() })
+		  	.then(function(data) {
+		  		drawWeather(data);
+		    	console.log(data);
+		  	})
+		  	.catch(function(err) {
+		  		console.log(err);
+		  		
+		  	});
+		}
+
+		function degToCompass(num) {
+    		var val = Math.floor((num / 22.5) + 0.5);
+    		var arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+    		return arr[(val % 16)];
+}
+
+		function drawWeather(d) { 
+			var celcius = Math.round(parseFloat(d.main.temp)-273.15);
+			var fahrenheit = Math.round(((parseFloat(d.main.temp)-273.15)*1.8)+32); 
+			document.getElementById('deg_num').innerHTML = celcius;
+			document.getElementById('w_desc').innerHTML = d.weather[0].description;
+			document.getElementById('pressure').innerHTML = d.main.pressure + ' mm Hg';
+			document.getElementById('wind').innerHTML = d.wind.speed + ' m/s, ' + degToCompass(d.wind.deg);
+			document.getElementById('humidity').innerHTML = d.main.humidity + '%';
+			document.getElementById('weather_icon').src = 'http://openweathermap.org/img/wn/'+d.weather[0].icon +'@2x.png'; 
+		}
+
+		window.onload = function() {
+		  	weatherGet("Omsk");
+		}
+	</script>
+</head>
+<body>
+			<header class="header">
+				<div class="container">
+					<div class="header_in">
+						<div class="city_input">
+								<input type="text" class="city" id="city_search" placeholder="Город" value="Omsk">
+								<button class="city_btn" onclick="city_search();">OK</button>
+						</div>
+						<div class="switch">
+								<span class="deg">&deg;</span>
+							    <div class="switch-field">
+								    	<input type="radio" id="radio-one" name="switch-one" value="C" onclick="choose_c(this);" checked disabled/>
+								    	<label for="radio-one">C</label>
+								        <input type="radio" id="radio-two" name="switch-one" value="F" onclick="choose_f(this);" />
+								        <label for="radio-two">F</label>
+								</div>
+						</div>
+					</div>
+				</div>
+			</header>
+
+			<main class="main">
+				<div class="container">
+					<div class="main_in">
+						<div class="degree_show">
+							<img class="degree w_icon" id="weather_icon">
+							<h1 class="degree" id="deg_num"></h1>
+							<h1 class="degree" id="deg_icon">&deg;</h1>
+						</div>
+						<h6 class="weather_desc" id="w_desc"></h6>
+					</div>
+				</div>
+			</main>
+
+			<footer class="footer">
+				<div class="container">
+					<div class="footer_in">
+						<div class="weather_inf">
+								<div class="weather_inf_unit">
+									<div class="inf_name">Wind</div>
+									<div class="inf_text" id="wind"></div>
+								</div>
+								<div class="weather_inf_unit">
+									<div class="inf_name">Pressure</div>
+									<div class="inf_text" id="pressure"></div>
+								</div>
+								<div class="weather_inf_unit">
+									<div class="inf_name">Humidity</div>
+									<div class="inf_text" id="humidity"></div>
+								</div>
+								<div class="weather_inf_unit">
+									<div class="inf_name">Probability of precipitation</div>
+									<div class="inf_text">10%</div>
+								</div>
+							
+						</div>
+					</div>
+				</div>
+			</footer>
+
+</body>
+</html>
+	<script type="text/javascript">
+		function choose_c(celsius){
+			let fahr = document.querySelector("#deg_num").textContent;
+			document.querySelector("#deg_num").textContent = Math.round(parseFloat((fahr-32)/1.8));
+			document.getElementById("radio-one").disabled=true;
+			document.getElementById("radio-two").disabled=false;
+		}
+		function choose_f(fahrenheits){
+				let cels = document.querySelector("#deg_num").textContent;
+				document.querySelector("#deg_num").textContent = Math.round(parseFloat(cels*1.8+32));
+				document.getElementById("radio-two").disabled=true;
+				document.getElementById("radio-one").disabled=false;
+					
+		}
+	</script>
